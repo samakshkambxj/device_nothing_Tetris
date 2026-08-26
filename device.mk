@@ -144,6 +144,8 @@ PRODUCT_PACKAGES += \
     libtinycompress \
     libxml2.vendor
 
+# Fenrir
+$(call soong_config_set_bool,fastbootd,bypass_lock_state,true)
 
 PRODUCT_COPY_FILES += \
     $(call find-copy-subdir-files,*,$(LOCAL_PATH)/configs/audio/,$(TARGET_COPY_OUT_VENDOR)/etc)
