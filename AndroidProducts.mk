@@ -5,4 +5,4 @@
 #
 
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/lineage_Tetris.mk
+    $(LOCAL_DIR)/infinity_Tetris.mk

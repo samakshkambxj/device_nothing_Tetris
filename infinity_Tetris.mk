@@ -15,7 +15,7 @@ persist.vendor.power.adpf.enable=true \
 ro.vendor.powerhal.adpf.enable=true
 
 # Inherit LineageOS common config
-$(call inherit-product, vendor/lineage/config/common_full_phone.mk)
+$(call inherit-product, vendor/infinity/config/common_full_phone.mk)
 
 #gpu
 GPU_FREQS_PATH := /sys/devices/platform/13000000.mali/devfreq/available_frequencies
@@ -24,7 +24,7 @@ GPU_MIN_FREQ_PATH := /sys/devices/platform/13000000.mali/devfreq/min_freq
 # Inherit from Tetris device
 $(call inherit-product, device/nothing/Tetris/device.mk)
 
-PRODUCT_NAME := lineage_Tetris
+PRODUCT_NAME := infinity_Tetris
 PRODUCT_DEVICE := Tetris
 PRODUCT_BRAND := Nothing
 PRODUCT_MANUFACTURER := Nothing
@@ -38,3 +38,12 @@ PRODUCT_BUILD_PROP_OVERRIDES += \
     BuildDesc="Tetris 16 BP2A.250605.031.A3 2608121726 release-keys" \
     BuildFingerprint=Nothing/Tetris/Tetris:16/BP2A.250605.031.A3/2608121726:user/release-keys \
     DeviceProduct=$(DEVICE_CODENAME)
+
+# Maintainer Name
+INFINITY_MAINTAINER := "Samakshhhh"
+
+# Whether the device supports Fingerprint On Display
+TARGET_HAS_UDFPS := true
+
+# Whether Including Google Apps
+WITH_GAPPS := true
