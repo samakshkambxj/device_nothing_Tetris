@@ -103,12 +103,16 @@ BOARD_SHIPPING_API_LEVEL := 34
 PRODUCT_AAPT_CONFIG := normal
 PRODUCT_AAPT_PREF_CONFIG := xxhdpi
 
+# Boot animation
+TARGET_SCREEN_WIDTH := 1080
+TARGET_SCREEN_HEIGHT := 2400
+
+# Page size
+PRODUCT_NO_BIONIC_PAGE_SIZE_MACRO := true
+
 # Overlays
 $(call inherit-product, hardware/mediatek/overlay/mssi.mk)
 PRODUCT_ENFORCE_RRO_TARGETS := *
-
-DEVICE_PACKAGE_OVERLAYS += \
-    $(LOCAL_PATH)/overlay-lineage
 
 PRODUCT_PACKAGES += \
     ApertureOverlayTetris \
