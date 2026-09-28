@@ -119,3 +119,24 @@ prebuilt_etc {
     recovery: true,
     sub_dir: "init"
 }
+
+prebuilt_etc {
+    name: "init_conninfra.rc",
+    src: "etc/init_conninfra.rc",
+    sub_dir: "init/hw",
+    vendor: true
+}
+
+prebuilt_etc {
+    name: "init.nothing.hw.rc",
+    src: "etc/init.nothing.hw.rc",
+    sub_dir: "init",
+    device_specific: true,
+}
+
+prebuilt_etc {
+    name: "fstab.postinstall_avb",
+    filename: "fstab.postinstall",
+    src: "etc/fstab.postinstall_avb",
+    product_specific: true,
+}
