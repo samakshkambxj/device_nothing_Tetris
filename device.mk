@@ -392,6 +392,7 @@ $(call soong_config_set,surfaceflinger,mtk_dim_layer,NTFingerprintDimLayer)
 
 # Properties
 include $(LOCAL_PATH)/vendor_props.mk
+include hardware/mediatek/configs/properties/vendor_logtag.mk
 PRODUCT_COMPATIBLE_PROPERTY_OVERRIDE := true
 
 # Public libraries
