@@ -448,6 +448,9 @@ $(call inherit-product, device/nothing/Tetris-kernel/kernel.mk)
 PRODUCT_PACKAGES += \
     init.board_id.sh \
     init.board_id.rc \
+    init_conninfra.rc \
+    init.nothing.hw.rc \
+    fstab.postinstall_avb \
     init.insmod.sh \
     init.insmod.mt6878.cfg \
     init.cgroup.rc \
