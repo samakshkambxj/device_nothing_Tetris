@@ -20,6 +20,7 @@
 #include <fcntl.h>
 #include <poll.h>
 #include <unistd.h>
+
 #include <condition_variable>
 #include <memory>
 #include <mutex>
@@ -100,7 +101,7 @@ class UdfpsSensor : public OneShotSensor {
 
   protected:
     virtual void run() override;
-    virtual std::vector<Event> readEvents();
+    virtual std::vector<Event> readEvents() override;
 
   private:
     void interruptPoll();
@@ -123,7 +124,7 @@ class SingleTapSensor : public OneShotSensor {
 
   protected:
     virtual void run() override;
-    virtual std::vector<Event> readEvents();
+    virtual std::vector<Event> readEvents() override;
 
   private:
     void interruptPoll();
