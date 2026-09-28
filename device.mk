@@ -30,9 +30,6 @@ PRODUCT_PRODUCT_PROPERTIES += \
     ro.mtk_perf_response_time=1
 
 
-include $(LOCAL_PATH)/vendor_props.mk
-
-
 # Hotword
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/permissions/privapp-permissions-com.android.hotwordenrollment.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/privapp-permissions-com.android.hotwordenrollment.xml
