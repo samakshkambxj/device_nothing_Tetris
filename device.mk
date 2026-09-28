@@ -245,7 +245,13 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     android.hardware.health-V1-ndk \
     android.hardware.health@2.0 \
-    android.hardware.health-service.mediatek
+    android.hardware.health-service.mediatek \
+    android.hardware.health-service.mediatek-recovery \
+    vendor.lineage.health-service.default
+
+$(call soong_config_set,lineage_health,charging_control_charging_path,/proc/charger/usb_charger_en)
+$(call soong_config_set,lineage_health,charging_control_charging_enabled,0)
+$(call soong_config_set,lineage_health,charging_control_charging_disabled,1)
 
 # HIDL
 PRODUCT_PACKAGES += \
@@ -254,6 +260,20 @@ PRODUCT_PACKAGES += \
     libhidltransport.vendor \
     libhwbinder \
     libhwbinder.vendor
+
+# LiveDisplay
+PRODUCT_PACKAGES += \
+    vendor.lineage.livedisplay-service.sysfs
+
+$(call soong_config_set_bool,livedisplay_sysfs,enable_se,true)
+$(call soong_config_set,livedisplay_sysfs,se_path,/sys/panel_feature/hbm_mode)
+
+# ION
+$(call soong_config_set_bool,libion,legacy_impl,true)
+
+# Linker config
+PRODUCT_VENDOR_LINKER_CONFIG_FRAGMENTS += \
+    $(LOCAL_PATH)/configs/linker.config.json
 
 # Keymint
 PRODUCT_PACKAGES += \
