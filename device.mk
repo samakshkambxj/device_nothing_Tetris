@@ -404,6 +404,12 @@ ENABLE_VENDOR_RIL_SERVICE := true
 $(call inherit-product, hardware/mediatek/frameworks/mediatek-frameworks.mk)
 
 PRODUCT_PACKAGES += \
+    mdota_symlink
+
+PRODUCT_COPY_FILES += \
+    $(call find-copy-subdir-files,*,$(LOCAL_PATH)/configs/skus/,$(TARGET_COPY_OUT_ODM)/etc)
+
+PRODUCT_PACKAGES += \
     android.hardware.radio-V2-ndk.vendor \
     android.hardware.radio.config-V2-ndk.vendor \
     android.hardware.radio.data-V2-ndk.vendor \
