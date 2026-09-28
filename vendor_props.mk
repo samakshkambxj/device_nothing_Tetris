@@ -1,9 +1,3 @@
-ifeq (eng,$(TARGET_BUILD_VARIANT))
-VENDOR_LOG_LEVEL=I
-else
-VENDOR_LOG_LEVEL=S
-endif
-
 # ADB
 PRODUCT_PROPERTY_OVERRIDES += \
     persist.adb.nonblocking_ffs=0
@@ -42,6 +36,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.bluetooth.leaudio_offload.supported=false \
     ro.vendor.mtk_audio_tuning_tool_ver=V1 \
     ro.vendor.mtk_hifiaudio_support=1 \
+    ro.audio.spatializer_enabled=true \
     vendor.audio.powerhal.power.dl=true \
     vendor.audio.powerhal.power.ul=true \
     vendor.audio.usb.iems.period_us=5000 \
@@ -55,9 +50,22 @@ PRODUCT_PROPERTY_OVERRIDES += \
     vendor.streamin.pcm.dump=0 \
     vendor.bluetooth.ldac.abr=true
 
+# Bluetooth
+PRODUCT_PROPERTY_OVERRIDES += \
+    bluetooth.device.default_name=CMF Phone 1 \
+    bluetooth.device_id.vendor_id=0x0046 \
+    persist.vendor.audio.leaudio_sw_offload=true \
+    persist.vendor.bluetooth.leaudio_mode=ums-cg
+
+# Bootloader
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.oem_unlock_supported=1
+
 # Camera
 PRODUCT_PROPERTY_OVERRIDES += \
     camera.disable_zsl_mode=1 \
+    ro.camera.disableJpegR=true \
+    ro.camera.disableHeicUltraHDR=true \
     persist.vendor.camera3.pipeline.bufnum.base.imgo=4 \
     persist.vendor.camera3.pipeline.bufnum.base.lcso=4 \
     persist.vendor.camera3.pipeline.bufnum.base.rrzo=4 \
@@ -95,7 +103,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
     persist.vendor.bluetooth.broadcaster.tx_pwr=10 \
     persist.vendor.bluetooth.connection_improve=yes \
-    persist.vendor.bluetooth.leaudio_mode= \
     persist.vendor.bluetooth.supportopphdt=no \
     persist.vendor.connsys.chipid=-1 \
     persist.vendor.connsys.dynamic.dump=0 \
