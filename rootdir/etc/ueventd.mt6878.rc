@@ -116,12 +116,12 @@
 /dev/teeperf              0660   system     system
 
 #v4l2 device
-/dev/video*      0660 camera system
-/dev/media*      0660 camera system
-/dev/v4l-subdev* 0660 camera system
+/dev/video*      0660 media system
+/dev/media*      0660 media system
+/dev/v4l-subdev* 0660 media system
 
 #v4l2 codec
-/dev/vcu    0660 camera system
+/dev/vcu    0660 media system
 
 #fmt mode
 /dev/vdec-fmt    0660 media system
@@ -155,6 +155,11 @@
 # group, then they'll only see log entries for their UID.
 /dev/log/ksystem          0600   root       log
 
+/dev/adsp                 0660   root       media
+/dev/adsp_0               0440   system     media
+/dev/adsp_1               0440   system     media
+/dev/audio_ipi            0640   media      media
+/dev/adsp_in_scp          0660   root       media
 /dev/ccci*                0660   radio      radio
 /dev/ttyC*                0660   radio      radio
 /sys/kernel/ccci          modem_info   0644   radio       radio
@@ -244,3 +249,9 @@
 
 #dynamic sensor
 /dev/hidraw*   0660 system system
+
+#IStability AIDL partition
+/dev/block/platform/soc/112b0000.ufshci/by-name/binfo   0660    system     system
+
+#Add for nt_reserve1
+/dev/block/platform/soc/112b0000.ufshci/by-name/nt_reserve1  0660    system     system
