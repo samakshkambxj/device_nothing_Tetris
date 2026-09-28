@@ -9,7 +9,7 @@
 #include <aidl/android/hardware/biometrics/fingerprint/BnSession.h>
 #include <aidl/android/hardware/biometrics/fingerprint/ISessionCallback.h>
 #include <android/log.h>
-#include "fingerprint.h"
+#include "fingerprint-nothing.h"
 #include <hardware/hardware.h>
 #include <log/log.h>
 

@@ -26,6 +26,8 @@
 #define FINGERPRINT_MODULE_API_VERSION_3_0 HARDWARE_MODULE_API_VERSION(3, 0)
 #define FINGERPRINT_HARDWARE_MODULE_ID "fingerprint"
 
+#define NUM_FINGERS 5
+
 typedef enum fingerprint_msg_type {
     FINGERPRINT_ERROR = -1,
     FINGERPRINT_ACQUIRED = 1,
@@ -95,8 +97,7 @@ typedef struct fingerprint_enroll {
 } fingerprint_enroll_t;
 
 typedef struct fingerprint_iterator {
-    fingerprint_finger_id_t finger;
-    uint32_t remaining_templates;
+    fingerprint_finger_id_t fingers[NUM_FINGERS];
 } fingerprint_iterator_t;
 
 typedef fingerprint_iterator_t fingerprint_enumerated_t;
@@ -228,7 +229,7 @@ typedef struct fingerprint_device {
      * Function return: 0 on success
      *                  or a negative number in case of error, generally from the errno.h set.
      */
-    int (*set_active_group)(struct fingerprint_device* dev, uint32_t gid, const char* store_path);
+    int (*setActiveGroup)(struct fingerprint_device* dev, uint32_t gid, const char* store_path);
 
     /*
      * Authenticates an operation identifed by operation_id
@@ -304,9 +305,6 @@ typedef struct fingerprint_device {
      * Only applies to sensors where the HAL is reponsible for handling touches.
      */
     void (*setIgnoreDisplayTouches)(struct fingerprint_device* dev, bool shouldIgnore);
-
-    /* Goodix fingerprint extension command. */
-    int (*goodix_extCmd)(struct fingerprint_device* dev, int32_t cmd, int32_t param);
 
     /* Reserved for backward binary compatibility */
     void* reserved[4];

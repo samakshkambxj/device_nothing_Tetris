@@ -20,13 +20,6 @@ namespace hardware {
 namespace biometrics {
 namespace fingerprint {
 
-#define FOD_UI_STATUS "/sys/panel_feature/ui_status"
-#define FOD_HBM_DELAY 60
-
-void setFodStatus(bool status) {
-    ::android::base::WriteStringToFile(status ? "1" : "0", FOD_UI_STATUS);
-}
-
 void onClientDeath(void* cookie) {
     ALOGI("FingerprintService has died");
     Session* session = static_cast<Session*>(cookie);
@@ -37,11 +30,11 @@ void onClientDeath(void* cookie) {
 
 Session::Session(fingerprint_device_t* device, int32_t userId,
             std::shared_ptr<ISessionCallback> cb, LockoutTracker lockoutTracker)
-            : mDevice(device), mUserId(userId), mLockoutTracker(lockoutTracker), mCb(cb) {
+            : mDevice(device), mLockoutTracker(lockoutTracker), mUserId(userId), mCb(cb) {
     mDeathRecipient = AIBinder_DeathRecipient_new(onClientDeath);
 
     std::string path = ::android::base::StringPrintf("/data/vendor_de/%d/fpdata/", mUserId);
-    mDevice->set_active_group(mDevice, mUserId, path.c_str());
+    mDevice->setActiveGroup(mDevice, mUserId, path.c_str());
 }
 
 ndk::ScopedAStatus Session::generateChallenge() {
@@ -53,8 +46,7 @@ ndk::ScopedAStatus Session::generateChallenge() {
 
 ndk::ScopedAStatus Session::revokeChallenge(int64_t challenge) {
     ALOGI("revokeChallenge: %ld", challenge);
-    mDevice->goodix_extCmd(mDevice, 0, 0);
-    setFodStatus(false);
+
     mDevice->revokeChallenge(mDevice, challenge);
 
     return ndk::ScopedAStatus::ok();
@@ -125,7 +117,7 @@ ndk::ScopedAStatus Session::removeEnrollments(const std::vector<int32_t>& enroll
 ndk::ScopedAStatus Session::getAuthenticatorId() {
     uint64_t auth_id = mDevice->getAuthenticatorId(mDevice);
     ALOGI("getAuthenticatorId: %ld", auth_id);
-    
+
     return ndk::ScopedAStatus::ok();
 }
 
@@ -157,10 +149,7 @@ ndk::ScopedAStatus Session::onPointerDown(int32_t /*pointerId*/, int32_t x, int3
                                           float major) {
     ALOGI("onPointerDown: x=%d, y=%d, minor=%f, major=%f", x, y, minor, major);
 
-    mDevice->goodix_extCmd(mDevice, 1, 1);
-    setFodStatus(true);
-
-    checkSensorLockout();
+    ::android::base::WriteStringToFile("1", "/sys/panel_feature/ui_status");
 
     return ndk::ScopedAStatus::ok();
 }
@@ -168,8 +157,7 @@ ndk::ScopedAStatus Session::onPointerDown(int32_t /*pointerId*/, int32_t x, int3
 ndk::ScopedAStatus Session::onPointerUp(int32_t /*pointerId*/) {
     ALOGI("onPointerUp");
 
-    mDevice->goodix_extCmd(mDevice, 0, 0);
-    setFodStatus(false);
+    ::android::base::WriteStringToFile("0", "/sys/panel_feature/ui_status");
 
     return ndk::ScopedAStatus::ok();
 }
@@ -177,7 +165,7 @@ ndk::ScopedAStatus Session::onPointerUp(int32_t /*pointerId*/) {
 ndk::ScopedAStatus Session::onUiReady() {
     ALOGI("onUiReady");
 
-    // TODO: stub
+    ::android::base::WriteStringToFile("1", "/sys/panel_feature/ui_status");
 
     return ndk::ScopedAStatus::ok();
 }
@@ -223,8 +211,7 @@ ndk::ScopedAStatus Session::setIgnoreDisplayTouches(bool /*shouldIgnore*/) {
 ndk::ScopedAStatus Session::cancel() {
     ALOGI("cancel");
 
-    mDevice->goodix_extCmd(mDevice, 0, 0);
-    setFodStatus(false);
+    ::android::base::WriteStringToFile("0", "/sys/panel_feature/ui_status");
 
     int ret = mDevice->cancel(mDevice);
 
@@ -239,8 +226,9 @@ ndk::ScopedAStatus Session::cancel() {
 
 ndk::ScopedAStatus Session::close() {
     ALOGI("close");
-    mDevice->goodix_extCmd(mDevice, 0, 0);
-    setFodStatus(false);
+
+    ::android::base::WriteStringToFile("0", "/sys/panel_feature/ui_status");
+
     mClosed = true;
     mCb->onSessionClosed();
     AIBinder_DeathRecipient_delete(mDeathRecipient);
@@ -318,11 +306,6 @@ AcquiredInfo Session::VendorAcquiredFilter(int32_t info, int32_t* vendorCode) {
 bool Session::checkSensorLockout() {
     LockoutMode lockoutMode = mLockoutTracker.getMode();
 
-    if (lockoutMode != LockoutMode::NONE) {
-	mDevice->goodix_extCmd(mDevice, 0, 0);
-        setFodStatus(false);
-    }
-
     if (lockoutMode == LockoutMode::PERMANENT) {
         ALOGE("Fail: lockout permanent");
         mCb->onLockoutPermanent();
@@ -367,6 +350,7 @@ void Session::lockoutTimerExpired() {
 void Session::notify(const fingerprint_msg_t* msg) {
     switch (msg->type) {
         case FINGERPRINT_ERROR: {
+            ::android::base::WriteStringToFile("0", "/sys/panel_feature/ui_status");
             int32_t vendorCode = 0;
             Error result = VendorErrorFilter(msg->data.error, &vendorCode);
             ALOGD("onError(%hhd, %d)", result, vendorCode);
@@ -382,6 +366,11 @@ void Session::notify(const fingerprint_msg_t* msg) {
             } else {
                 ALOGW("onAcquired(AcquiredInfo::VENDOR, %d)", vendorCode);
                 // Do not send onAcquired or illumination will be turned off prematurely
+                if (vendorCode == 2) {
+                    ::android::base::WriteStringToFile("1", "/sys/panel_feature/ui_status");
+                } else if (vendorCode == 3) {
+                    ::android::base::WriteStringToFile("0", "/sys/panel_feature/ui_status");
+                }
             }
         } break;
         case FINGERPRINT_TEMPLATE_ENROLLING: {
@@ -389,19 +378,20 @@ void Session::notify(const fingerprint_msg_t* msg) {
                   msg->data.enroll.finger.gid, msg->data.enroll.samples_remaining);
             mCb->onEnrollmentProgress(msg->data.enroll.finger.fid,
                                       msg->data.enroll.samples_remaining);
-            if (msg->data.enroll.samples_remaining == 0) {
-                mDevice->goodix_extCmd(mDevice, 0, 0);
-                setFodStatus(false);
-            }
         } break;
         case FINGERPRINT_TEMPLATE_REMOVED: {
-            ALOGD("onRemove(fid=%d, gid=%d, rem=%d)", msg->data.removed.finger.fid,
-                  msg->data.removed.finger.gid, msg->data.removed.remaining_templates);
-            std::vector<int> enrollments;
-            enrollments.push_back(msg->data.removed.finger.fid);
+            std::vector<int32_t> enrollments;
+            enrollments.reserve(NUM_FINGERS);
+            for (unsigned int i = 0; i < NUM_FINGERS; i++) {
+                int32_t fid = msg->data.removed.fingers[i].fid;
+                if (!fid) break;
+                ALOGD("onRemove(fid=%d)", fid);
+                enrollments.push_back(fid);
+            }
             mCb->onEnrollmentsRemoved(enrollments);
         } break;
         case FINGERPRINT_AUTHENTICATED: {
+            ::android::base::WriteStringToFile("0", "/sys/panel_feature/ui_status");
             ALOGD("onAuthenticated(fid=%d, gid=%d)", msg->data.authenticated.finger.fid,
                 msg->data.authenticated.finger.gid);
             if (msg->data.authenticated.finger.fid != 0) {
@@ -411,8 +401,6 @@ void Session::notify(const fingerprint_msg_t* msg) {
 
                 mCb->onAuthenticationSucceeded(msg->data.authenticated.finger.fid, authToken);
                 mLockoutTracker.reset(true);
-                mDevice->goodix_extCmd(mDevice, 0, 0);
-                setFodStatus(false);
             } else {
                 mCb->onAuthenticationFailed();
                 mLockoutTracker.addFailedAttempt();
@@ -420,14 +408,15 @@ void Session::notify(const fingerprint_msg_t* msg) {
             }
         } break;
         case FINGERPRINT_TEMPLATE_ENUMERATING: {
-            ALOGD("onEnumerate(fid=%d, gid=%d, rem=%d)", msg->data.enumerated.finger.fid,
-                  msg->data.enumerated.finger.gid, msg->data.enumerated.remaining_templates);
-            static std::vector<int> enrollments;
-            enrollments.push_back(msg->data.enumerated.finger.fid);
-            if (msg->data.enumerated.remaining_templates == 0) {
-                mCb->onEnrollmentsEnumerated(enrollments);
-                enrollments.clear();
+            std::vector<int32_t> enrollments;
+            enrollments.reserve(NUM_FINGERS);
+            for (unsigned int i = 0; i < NUM_FINGERS; i++) {
+                int32_t fid = msg->data.enumerated.fingers[i].fid;
+                if (!fid) break;
+                ALOGD("onEnumerate(fid=%d)", fid);
+                enrollments.push_back(fid);
             }
+            mCb->onEnrollmentsEnumerated(enrollments);
         } break;
         case FINGERPRINT_GENERATE_CHALLENGE: {
             ALOGD("onChallengeGenerated(%lu)", msg->data.data);

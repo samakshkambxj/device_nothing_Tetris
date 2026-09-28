@@ -27,41 +27,77 @@ namespace {
 constexpr int SENSOR_ID = 0;
 constexpr common::SensorStrength SENSOR_STRENGTH = common::SensorStrength::STRONG;
 constexpr int MAX_ENROLLMENTS_PER_USER = 5;
-constexpr char HW_COMPONENT_ID[] = "fingerprintSensor";
-constexpr char HW_VERSION[] = "vendor/model/revision";
-constexpr char FW_VERSION[] = "1.01";
-constexpr char SERIAL_NUMBER[] = "00000001";
-constexpr char SW_COMPONENT_ID[] = "matchingAlgorithm";
-constexpr char SW_VERSION[] = "vendor/version/revision";
+constexpr const char* HW_COMPONENT_ID = "fingerprintSensor";
+constexpr const char* HW_VERSION = "vendor/model/revision";
+constexpr const char* FW_VERSION = "1.01";
+constexpr const char* SERIAL_NUMBER = "00000001";
+constexpr const char* SW_COMPONENT_ID = "matchingAlgorithm";
+constexpr const char* SW_VERSION = "vendor/version/revision";
 }  // namespace
+
+enum class sensorProp {
+    PROP_REAR,
+    PROP_UDFPS,
+    PROP_UDFPS_OPTICAL,
+    PROP_SIDE,
+    PROP_HOME,
+    PROP_UNKNOWN,
+};
+
+sensorProp parse_prop(const std::string& sensorTypeProp) {
+    if (sensorTypeProp.empty() || sensorTypeProp == "default" || sensorTypeProp == "rear")
+        return sensorProp::PROP_REAR;
+    if (sensorTypeProp == "udfps")
+        return sensorProp::PROP_UDFPS;
+    if (sensorTypeProp == "udfps_optical")
+        return sensorProp::PROP_UDFPS_OPTICAL;
+    if (sensorTypeProp == "side")
+        return sensorProp::PROP_SIDE;
+    if (sensorTypeProp == "home")
+        return sensorProp::PROP_HOME;
+
+    return sensorProp::PROP_UNKNOWN;
+}
 
 static Fingerprint* sInstance;
 
-Fingerprint::Fingerprint()     
-    : mDevice(nullptr),
-      mMaxEnrollmentsPerUser(MAX_ENROLLMENTS_PER_USER),
-      mSensorType(FingerprintSensorType::UNKNOWN) {
-
+Fingerprint::Fingerprint() {
     sInstance = this; // keep track of the most recent instance
 
-    mDevice = openHal();
-    if (!mDevice) {
-        ALOGE("Can't open HAL module");
+    if (mDevice) {
+        ALOGI("fingerprint HAL already opened");
+    } else {
+        mDevice = openHal();
+        if (!mDevice) {
+            ALOGE("Can't open HAL module");
+        }
     }
 
     std::string sensorTypeProp = FingerprintHalProperties::type().value_or("");
-    if (sensorTypeProp == "" || sensorTypeProp == "default" || sensorTypeProp == "rear")
-        mSensorType = FingerprintSensorType::REAR;
-    else if (sensorTypeProp == "udfps")
-        mSensorType = FingerprintSensorType::UNDER_DISPLAY_ULTRASONIC;
-    else if (sensorTypeProp == "udfps_optical")
-        mSensorType = FingerprintSensorType::UNDER_DISPLAY_OPTICAL;
-    else if (sensorTypeProp == "side")
-        mSensorType = FingerprintSensorType::POWER_BUTTON;
-    else if (sensorTypeProp == "home")
-        mSensorType = FingerprintSensorType::HOME_BUTTON;
-    else
-        mSensorType = FingerprintSensorType::UNKNOWN;
+
+    enum sensorProp c = parse_prop(sensorTypeProp);
+        switch (c) {
+            case sensorProp::PROP_REAR:
+                mSensorType = FingerprintSensorType::REAR;
+                break;
+            case sensorProp::PROP_UDFPS:
+                mSensorType = FingerprintSensorType::UNDER_DISPLAY_ULTRASONIC;
+                break;
+            case sensorProp::PROP_UDFPS_OPTICAL:
+                mSensorType = FingerprintSensorType::UNDER_DISPLAY_OPTICAL;
+                break;
+            case sensorProp::PROP_SIDE:
+                mSensorType = FingerprintSensorType::POWER_BUTTON;
+                break;
+            case sensorProp::PROP_HOME:
+                mSensorType = FingerprintSensorType::HOME_BUTTON;
+                break;
+            case sensorProp::PROP_UNKNOWN:
+            default:
+                ALOGE("Failed to return sensor type");
+                mSensorType = FingerprintSensorType::UNKNOWN;
+                break;
+        }
 
     mMaxEnrollmentsPerUser =
             FingerprintHalProperties::max_enrollments_per_user().value_or(MAX_ENROLLMENTS_PER_USER);
@@ -171,7 +207,7 @@ ndk::ScopedAStatus Fingerprint::createSession(int32_t /*sensorId*/, int32_t user
                                               const std::shared_ptr<ISessionCallback>& cb,
                                               std::shared_ptr<ISession>* out) {
     CHECK(mSession == nullptr || mSession->isClosed()) << "Open session already exists!";
- 
+
     mSession = SharedRefBase::make<Session>(mDevice, userId, cb, mLockoutTracker);
     *out = mSession;
 
