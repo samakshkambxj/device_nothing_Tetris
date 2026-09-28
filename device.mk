@@ -175,7 +175,7 @@ $(call inherit-product, hardware/dolby/dolby.mk)
 
 # Bluetooth
 PRODUCT_PACKAGES += \
-    android.hardware.bluetooth-V1-ndk.vendor \
+    android.hardware.bluetooth-service.mediatek \
     android.hardware.bluetooth.audio-V3-ndk.vendor \
     android.hardware.bluetooth.audio-impl \
     libbluetooth_audio_session \
@@ -191,7 +191,8 @@ PRODUCT_PACKAGES += \
     android.hardware.camera.device@3.6.vendor \
     android.hardware.camera.metadata-V2-ndk.vendor \
     android.hardware.camera.provider-V2-ndk.vendor \
-    android.hardware.camera.provider@2.6.vendor
+    android.hardware.camera.provider@2.6.vendor \
+    libmtk_cam_shim_Tetris
 
 # Cgroup and task_profiles
 PRODUCT_COPY_FILES += \
