@@ -1,7 +1,22 @@
-type proc_vibrator, fs_type, proc_type;
+# Charger
+type vendor_proc_charger, fs_type, proc_type;
+
+# Display
+type vendor_sysfs_graphics, fs_type, sysfs_type;
+
+# Fingerprint
+type vendor_goodix_gf_data_file, file_type, data_file_type;
+
+# NTF
+type vendor_ntf_file, file_type;
 type proc_touchpanel, fs_type, proc_type;
-type aac_richtap_dev_device, dev_type;
-type fingerprint_data_file, data_file_type, file_type;
-type vendor_sysfs_graphics, fs_type, sysfs_type, mlstrustedobject;
-type sysfs_fod, fs_type, sysfs_type, mlstrustedobject;
-type sysfs_touch, fs_type, sysfs_type, mlstrustedobject;
+type vendor_sysfs_touchpanel, fs_type, sysfs_type;
+
+# Compat: ours-only consumers retained for build
+# (hal_health needs sysfs_ntchg; platform_app needs sysfs_fod;
+#  prop/base/vendor hal_sensors needs sysfs_touch;
+#  hal_vibrator fallback needs proc_vibrator)
+type sysfs_ntchg, fs_type, sysfs_type;
+type sysfs_fod, fs_type, sysfs_type;
+type sysfs_touch, fs_type, sysfs_type;
+type proc_vibrator, fs_type, proc_type;
