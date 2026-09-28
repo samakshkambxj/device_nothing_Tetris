@@ -416,12 +416,12 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.lmk.downgrade_pressure=60 \
     ro.lmk.filecache_min_kb=153600 \
-    ro.lmk.kill_timeout_ms=100 \
+    ro.lmk.kill_timeout_ms=50 \
     ro.lmk.stall_limit_critical=40 \
     ro.lmk.psi_complete_stall_ms=700 \
     ro.lmk.swap_free_low_percentage=10 \
-    ro.lmk.swap_util_max=90 \
-    ro.lmk.thrashing_limit=40 \
+    ro.lmk.swap_util_max=100 \
+    ro.lmk.thrashing_limit=100 \
     ro.lmk.thrashing_limit_decay=10 \
     ro.logd.kernel=false
 
@@ -437,6 +437,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.vendor.mtk_hdr_video_support=1 \
     ro.vendor.mtk_video_hevc_enc_support=1 \
     vendor.mtk.vdec.decode.error.handle.mode=1 \
+    vendor.media.omx=0 \
     vendor.mtk.vdec.waitkeyframeforplay=9 \
     vendor.mtk_thumbnail_optimization=true \
     vendor.performance.frs.tz_name=shell_max \
@@ -466,17 +467,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # Nothing
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.vendor.nothing.feature.base=0x28124a040124b4247b97ffL \
-    ro.vendor.nothing.feature.diff.device.Pacman=0x890493f4d20258c42080L \
-    ro.vendor.nothing.feature.diff.device.PacmanPro=0x289b493f4d20258c42080L \
-    ro.vendor.nothing.feature.diff.device.Pong=0x20044a404803d1842000L \
-    ro.vendor.nothing.feature.diff.device.Spacewar=0x20042a0041a032c34000L \
-    ro.vendor.nothing.feature.diff.device.Tetris=0x2cf3b13f4f22258c401c0L \
-    ro.vendor.nothing.feature.diff.product.Pong=0x0 \
-    ro.vendor.nothing.feature.diff.product.PongEEA=0x0 \
-    ro.vendor.nothing.feature.diff.product.PongIND=0x0 \
-    ro.vendor.nothing.feature.diff.product.Spacewar=0x0 \
-    ro.vendor.nothing.feature.diff.product.SpacewarEEA=0x0
+    ro.vendor.nothing.feature.base=0xe24800001004458438124a040106b4247b97ffL \
+    ro.vendor.nothing.feature.diff.device.Tetris=0x20000000002cf3b13f4d02258c401c0L
 
 # PQ
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -525,8 +517,17 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.vendor.pq.mtk_video_transition=0 \
     ro.vendor.pref_scale_enable_cfg=1
 
+# Power
+PRODUCT_PROPERTY_OVERRIDES += \
+    vendor.powerhal.interaction.min=10 \
+    vendor.powerhal.interaction.max=50 \
+    vendor.powerhal.interaction.offset=0
+
 # Radio
 PRODUCT_PROPERTY_OVERRIDES += \
+    persist.dbg.volte_avail_ovr=1 \
+    persist.dbg.vt_avail_ovr=1 \
+    persist.dbg.wfc_avail_ovr=1 \
     persist.radio.multisim.config=dsds \
     persist.vendor.factory.GB2312=yes \
     persist.vendor.ims_support=1 \
