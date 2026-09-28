@@ -535,9 +535,11 @@ PRODUCT_PACKAGES += \
     libkeystore-engine-wifi-hidl \
     libnetutils \
     libnetutils.vendor \
+    libwifi-hal-wrapper \
     wifi_legacy \
     wpa_supplicant \
-    wificond
+    wificond \
+    wlan_assistant
 
 PRODUCT_COPY_FILES += \
     $(call find-copy-subdir-files,*,$(LOCAL_PATH)/configs/wifi/,$(TARGET_COPY_OUT_VENDOR)/etc/wifi)
