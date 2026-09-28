@@ -121,7 +121,11 @@ PRODUCT_PACKAGES += \
     SettingsResTetris \
     SystemUIOverlayTetris \
     UpdaterResTetris \
+    WifiResOverlayTetris \
     CarrierConfigResTargetTetris
+
+PRODUCT_PACKAGES += \
+    NcmTetheringOverlay
 
 # APNs
 PRODUCT_COPY_FILES += \
