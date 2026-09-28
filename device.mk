@@ -504,17 +504,24 @@ PRODUCT_SOONG_NAMESPACES += \
     $(LOCAL_PATH)
 
 # USB
+$(call soong_config_set_bool,android_hardware_mediatek_usb,audio_accessory_supported,true)
+
 PRODUCT_PACKAGES += \
     android.frameworks.stats-V1-ndk.vendor \
-    android.hardware.usb-V1-ndk.vendor \
-    android.hardware.usb.gadget-V1-ndk.vendor
+    android.hardware.usb-service.mediatek \
+    android.hardware.usb.gadget-service.mediatek
 
 # Vibrator
 PRODUCT_PACKAGES += \
-    android.hardware.vibrator.service.Tetris
+    android.hardware.vibrator.service.Tetris-richtap
+
+# VNDK
+PRODUCT_PACKAGES += \
+    vndservicemanager
 
 # Wifi
 $(call soong_config_set,wpa_supplicant_8,board_wlan_mediatek_stability,true)
+$(call soong_config_set_bool,mediatek_wifi_hal,use_pre_u_qpr2_struct,true)
 
 PRODUCT_PACKAGES += \
     android.hardware.tetheroffload-V1-ndk.vendor \
