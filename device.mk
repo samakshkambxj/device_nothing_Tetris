@@ -434,7 +434,12 @@ PRODUCT_COPY_FILES += \
 
 # fastbootd
 PRODUCT_PACKAGES += \
+    android.hardware.fastboot-service.example_recovery \
     fastbootd
+
+# Doze
+PRODUCT_PACKAGES += \
+    NothingDoze
 
 # Kernel
 $(call inherit-product, device/nothing/Tetris-kernel/kernel.mk)
